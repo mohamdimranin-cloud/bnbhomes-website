@@ -1,4 +1,5 @@
 import Slider from './Slider'
+import { useResponsive } from '../hooks/useResponsive'
 
 // Unique room images — duplicates removed
 const allImages = [
@@ -31,6 +32,9 @@ const allImages = [
 ]
 
 export default function Gallery() {
+  const { isMobile } = useResponsive()
+  const sliderHeight = isMobile ? 300 : 480
+
   return (
     <section id="gallery" style={{ padding: '100px 0', background: '#080e14' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
@@ -50,17 +54,19 @@ export default function Gallery() {
           </p>
         </div>
 
-        {/* Slider — all 31 images */}
+        {/* Slider — full width, no overflow */}
         <div style={{
           borderRadius: 20,
           overflow: 'hidden',
           border: '1px solid rgba(17,104,133,0.3)',
           boxShadow: '0 8px 48px rgba(0,0,0,0.5), 0 0 40px rgba(17,104,133,0.15)',
+          width: '100%',
+          maxWidth: '100%',
         }}>
           <Slider
             images={allImages}
             autoPlay={3500}
-            height={480}
+            height={sliderHeight}
             showDots={true}
             showArrows={true}
             objectFit="cover"

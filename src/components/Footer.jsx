@@ -1,3 +1,5 @@
+import { useResponsive } from '../hooks/useResponsive'
+
 const scrollTo = (id) =>
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 
@@ -17,6 +19,14 @@ const quickLinks = [
 ]
 
 export default function Footer() {
+  const { isMobile, isTablet } = useResponsive()
+
+  const gridCols = isMobile
+    ? '1fr'
+    : isTablet
+    ? 'repeat(2, 1fr)'
+    : 'repeat(4, 1fr)'
+
   const linkStyle = {
     fontSize: '0.875rem',
     color: '#7ba3b8',
@@ -27,6 +37,7 @@ export default function Footer() {
     fontFamily: 'Inter, sans-serif',
     padding: 0,
     textAlign: 'left',
+    wordBreak: 'break-word',
   }
 
   return (
@@ -36,8 +47,8 @@ export default function Footer() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-            gap: 48,
+            gridTemplateColumns: gridCols,
+            gap: isMobile ? 32 : 48,
             marginBottom: 48,
           }}
         >
@@ -62,7 +73,7 @@ export default function Footer() {
             <p style={{ color: '#7ba3b8', fontSize: '0.9rem', lineHeight: 1.7, margin: '0 0 24px' }}>
               Premium stays in the heart of Trivandrum. Modern comfort, warm hospitality.
             </p>
-            <div style={{ display: 'flex', gap: 12 }}>
+            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
               {[
                 { icon: '📱', href: 'tel:7540000750', label: 'Call' },
                 { icon: '💬', href: 'https://wa.me/917540000750', label: 'WhatsApp', external: true },
@@ -86,6 +97,7 @@ export default function Footer() {
                     fontSize: '1rem',
                     transition: 'all 0.2s',
                     textDecoration: 'none',
+                    flexShrink: 0,
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.borderColor = '#1a8fb5'
@@ -218,7 +230,7 @@ export default function Footer() {
               <li>
                 <a
                   href="mailto:bnbhomestvm@gmail.com"
-                  style={{ ...linkStyle, display: 'inline-block' }}
+                  style={{ ...linkStyle, display: 'inline-block', wordBreak: 'break-all' }}
                   onMouseEnter={(e) => (e.target.style.color = '#1a8fb5')}
                   onMouseLeave={(e) => (e.target.style.color = '#7ba3b8')}
                 >
@@ -229,22 +241,23 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom bar */}
+        {/* Bottom bar — flex on desktop, stacked on mobile */}
         <div
           style={{
             paddingTop: 32,
             borderTop: '1px solid rgba(17,104,133,0.25)',
             display: 'flex',
+            flexDirection: isMobile ? 'column' : 'row',
             justifyContent: 'space-between',
-            alignItems: 'center',
-            flexWrap: 'wrap',
+            alignItems: isMobile ? 'center' : 'center',
             gap: 8,
             fontSize: '0.8rem',
             color: '#7ba3b8',
+            textAlign: isMobile ? 'center' : 'left',
           }}
         >
-          <p>© 2026 BnB Homes. All rights reserved.</p>
-          <p>Designed with ❤️ in Trivandrum</p>
+          <p style={{ margin: 0 }}>© 2026 BnB Homes. All rights reserved.</p>
+          <p style={{ margin: 0 }}>Designed with ❤️ in Trivandrum</p>
         </div>
       </div>
     </footer>

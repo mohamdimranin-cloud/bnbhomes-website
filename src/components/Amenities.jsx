@@ -1,3 +1,5 @@
+import { useResponsive } from '../hooks/useResponsive'
+
 const amenities = [
   {
     icon: '⚡',
@@ -53,6 +55,8 @@ function AmenityCard({ amenity, index }) {
         transition: 'all 0.3s ease',
         textAlign: 'center',
         transitionDelay: `${index * 0.07}s`,
+        minWidth: 0,
+        overflow: 'hidden',
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.borderColor = '#1a8fb5'
@@ -68,10 +72,13 @@ function AmenityCard({ amenity, index }) {
       <span style={{ fontSize: '2.2rem', marginBottom: 16, display: 'block' }}>
         {amenity.icon}
       </span>
-      <h4 style={{ fontSize: '1rem', fontWeight: 600, color: '#ffffff', marginBottom: 10 }}>
+      <h4 style={{
+        fontSize: '1rem', fontWeight: 600, color: '#ffffff', marginBottom: 10,
+        wordBreak: 'break-word',
+      }}>
         {amenity.title}
       </h4>
-      <p style={{ fontSize: '0.85rem', color: '#7ba3b8', lineHeight: 1.6 }}>
+      <p style={{ fontSize: '0.85rem', color: '#7ba3b8', lineHeight: 1.6, wordBreak: 'break-word' }}>
         {amenity.desc}
       </p>
     </div>
@@ -79,6 +86,14 @@ function AmenityCard({ amenity, index }) {
 }
 
 export default function Amenities() {
+  const { isMobile, isTablet } = useResponsive()
+
+  const gridCols = isMobile
+    ? '1fr'
+    : isTablet
+    ? 'repeat(2, 1fr)'
+    : 'repeat(4, 1fr)'
+
   return (
     <section id="amenities" style={{ padding: '100px 0', background: '#0d1821' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
@@ -103,8 +118,9 @@ export default function Amenities() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+            gridTemplateColumns: gridCols,
             gap: 24,
+            alignItems: 'stretch',
           }}
         >
           {amenities.map((amenity, i) => (

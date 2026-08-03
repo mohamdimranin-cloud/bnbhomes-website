@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState } from 'react'
 import LazyImage from './LazyImage'
-import Slider from './Slider'
+import { useResponsive } from '../hooks/useResponsive'
 
 const scrollTo = (id) =>
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -91,6 +91,7 @@ function RoomCard({ room, index }) {
         transition: 'all 0.3s ease',
         position: 'relative',
         cursor: 'default',
+        minWidth: 0,
       }}
       onMouseEnter={(e) => {
         e.currentTarget.style.borderColor = '#116885'
@@ -103,19 +104,26 @@ function RoomCard({ room, index }) {
         e.currentTarget.style.boxShadow = 'none'
       }}
     >
-      {/* Room image slider */}
-      <div style={{ position: 'relative', height: 200 }}>
-        <Slider
-          images={room.images}
-          autoPlay={3000}
-          height={200}
-          showDots={true}
-          showArrows={true}
-          objectFit="cover"
+      {/* Room image — slider container: overflow hidden to prevent bleed */}
+      <div style={{ position: 'relative', height: 200, overflow: 'hidden' }}>
+        <LazyImage
+          src={room.images[0]}
+          alt={room.name}
+          style={{ height: 200 }}
+          imgStyle={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
+        <div style={{
+          position: 'absolute', bottom: 10, right: 10,
+          background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)',
+          borderRadius: 20, padding: '3px 10px',
+          fontSize: '0.7rem', color: '#fff',
+          border: '1px solid rgba(255,255,255,0.15)',
+        }}>
+          📷 {room.images.length} photos
+        </div>
         {room.featured && (
           <div style={{
-            position: 'absolute', top: 10, left: 10, zIndex: 10,
+            position: 'absolute', top: 10, left: 10,
             fontSize: '0.7rem', fontWeight: 600,
             padding: '4px 12px',
             background: 'linear-gradient(135deg, #116885, #1a8fb5)',
@@ -131,28 +139,37 @@ function RoomCard({ room, index }) {
       <div className="room-card-shine" style={{ opacity: room.featured ? 1 : 0 }} />
 
       {/* Card body */}
-      <div style={{ padding: 28 }}>
+      <div style={{ padding: 24 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-          <span style={{ fontSize: '1.5rem' }}>{room.icon}</span>
+          <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>{room.icon}</span>
           <h3 style={{
             fontFamily: '"Space Grotesk", sans-serif',
             fontSize: '1.2rem', fontWeight: 700, color: '#ffffff',
+            margin: 0, minWidth: 0, overflow: 'hidden',
+            textOverflow: 'ellipsis', whiteSpace: 'nowrap',
           }}>
             {room.name}
           </h3>
         </div>
 
-        <p style={{ fontSize: '0.875rem', color: '#7ba3b8', lineHeight: 1.6, marginBottom: 16 }}>
+        <p style={{
+          fontSize: '0.875rem', color: '#7ba3b8', lineHeight: 1.6,
+          marginBottom: 16, wordBreak: 'break-word',
+        }}>
           {room.desc}
         </p>
 
-        <ul style={{ listStyle: 'none', display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 20, padding: 0 }}>
+        <ul style={{
+          listStyle: 'none', display: 'flex', flexWrap: 'wrap', gap: 6,
+          marginBottom: 20, padding: 0,
+        }}>
           {room.features.map((f) => (
             <li key={f} style={{
               fontSize: '0.72rem', padding: '3px 10px',
               background: 'rgba(17,104,133,0.15)',
               border: '1px solid rgba(17,104,133,0.25)',
               borderRadius: 100, color: '#7ba3b8',
+              whiteSpace: 'nowrap',
             }}>
               {f}
             </li>
@@ -172,6 +189,14 @@ function RoomCard({ room, index }) {
 }
 
 export default function Rooms() {
+  const { isMobile, isTablet } = useResponsive()
+
+  const gridCols = isMobile
+    ? '1fr'
+    : isTablet
+    ? 'repeat(2, 1fr)'
+    : 'repeat(3, 1fr)'
+
   return (
     <section id="rooms" style={{ padding: '100px 0' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
@@ -199,7 +224,7 @@ export default function Rooms() {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gridTemplateColumns: gridCols,
             gap: 24,
           }}
         >

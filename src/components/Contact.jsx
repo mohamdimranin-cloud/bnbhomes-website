@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { useResponsive } from '../hooks/useResponsive'
 
 const contactMethods = [
   { icon: '📱', label: 'Call / WhatsApp', value: '7540000750', href: 'tel:7540000750' },
@@ -17,6 +18,7 @@ function generateBookingId() {
 const STEPS = ['Your Details', 'Stay Dates', 'Confirm']
 
 export default function Contact() {
+  const { isMobile } = useResponsive()
   const today = new Date().toISOString().split('T')[0]
   const [step, setStep] = useState(0)
   const [bookingId] = useState(generateBookingId)
@@ -29,7 +31,6 @@ export default function Contact() {
 
   const set = (key, val) => setForm(p => ({ ...p, [key]: val }))
 
-  // Auto-advance checkout if checkin changes and checkout is before it
   useEffect(() => {
     if (form.checkin && form.checkout && form.checkout <= form.checkin) {
       const d = new Date(form.checkin)
@@ -62,7 +63,6 @@ export default function Contact() {
     }, 800)
   }
 
-  // Validation per step
   const canNext = () => {
     if (step === 0) return form.name.trim() && form.phone.trim()
     if (step === 1) return form.checkin && form.checkout && nights > 0
@@ -81,6 +81,7 @@ export default function Contact() {
     transition: 'all 0.2s',
     width: '100%',
     WebkitAppearance: 'none',
+    boxSizing: 'border-box',
   }
   const labelStyle = {
     display: 'block', fontSize: '0.75rem', fontWeight: 600,
@@ -94,8 +95,9 @@ export default function Contact() {
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: 64, alignItems: 'start',
+          gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+          gap: isMobile ? 40 : 64,
+          alignItems: 'start',
         }}>
 
           {/* ── LEFT: contact info ── */}
@@ -118,14 +120,15 @@ export default function Contact() {
                   padding: '16px 20px', background: '#0f1e2d',
                   border: '1px solid rgba(17,104,133,0.25)', borderRadius: 12,
                   transition: 'all 0.3s', textDecoration: 'none',
+                  minWidth: 0, overflow: 'hidden',
                 }}
                   onMouseEnter={e => { e.currentTarget.style.borderColor = '#1a8fb5'; e.currentTarget.style.transform = 'translateX(6px)' }}
                   onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(17,104,133,0.25)'; e.currentTarget.style.transform = 'translateX(0)' }}
                 >
-                  <span style={{ fontSize: '1.5rem' }}>{m.icon}</span>
-                  <div>
+                  <span style={{ fontSize: '1.5rem', flexShrink: 0 }}>{m.icon}</span>
+                  <div style={{ minWidth: 0 }}>
                     <strong style={{ display: 'block', fontSize: '0.83rem', color: '#ffffff', fontWeight: 600 }}>{m.label}</strong>
-                    <span style={{ fontSize: '0.9rem', color: '#1a8fb5' }}>{m.value}</span>
+                    <span style={{ fontSize: '0.9rem', color: '#1a8fb5', wordBreak: 'break-all' }}>{m.value}</span>
                   </div>
                 </a>
               ))}
@@ -139,19 +142,26 @@ export default function Contact() {
               border: '1px solid rgba(17,104,133,0.35)',
               borderRadius: 24, overflow: 'hidden',
               boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 60px rgba(17,104,133,0.1)',
+              minWidth: 0,
             }}>
 
               {/* Card header */}
               <div style={{
                 background: 'linear-gradient(135deg, #116885, #0c4d62)',
-                padding: '24px 32px',
+                padding: isMobile ? '20px 20px' : '24px 32px',
                 position: 'relative', overflow: 'hidden',
               }}>
-                {/* decorative circles */}
-                <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
-                <div style={{ position: 'absolute', top: 10, right: 20, width: 60, height: 60, borderRadius: '50%', background: 'rgba(0,229,255,0.08)' }} />
+                <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)', pointerEvents: 'none' }} />
+                <div style={{ position: 'absolute', top: 10, right: 20, width: 60, height: 60, borderRadius: '50%', background: 'rgba(0,229,255,0.08)', pointerEvents: 'none' }} />
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative' }}>
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  position: 'relative',
+                  flexWrap: 'wrap',
+                  gap: 12,
+                }}>
                   <div>
                     <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 6 }}>
                       Advance Booking
@@ -160,7 +170,7 @@ export default function Contact() {
                       Reserve Your Room
                     </h3>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
+                  <div style={{ textAlign: 'right', flexShrink: 0 }}>
                     <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4, letterSpacing: '1px' }}>BOOKING ID</div>
                     <div style={{
                       fontFamily: '"Space Grotesk", sans-serif',
@@ -176,13 +186,13 @@ export default function Contact() {
                 {/* Step progress bar */}
                 <div style={{ marginTop: 20, display: 'flex', gap: 8 }}>
                   {STEPS.map((s, i) => (
-                    <div key={s} style={{ flex: 1 }}>
+                    <div key={s} style={{ flex: 1, minWidth: 0 }}>
                       <div style={{
                         height: 3, borderRadius: 2,
                         background: i <= step ? '#00e5ff' : 'rgba(255,255,255,0.2)',
                         transition: 'background 0.4s',
                       }} />
-                      <div style={{ fontSize: '0.65rem', color: i <= step ? '#00e5ff' : 'rgba(255,255,255,0.4)', marginTop: 5, textAlign: 'center', letterSpacing: '0.5px' }}>
+                      <div style={{ fontSize: '0.65rem', color: i <= step ? '#00e5ff' : 'rgba(255,255,255,0.4)', marginTop: 5, textAlign: 'center', letterSpacing: '0.5px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {s}
                       </div>
                     </div>
@@ -191,7 +201,7 @@ export default function Contact() {
               </div>
 
               {/* Card body */}
-              <div style={{ padding: 32 }}>
+              <div style={{ padding: isMobile ? 20 : 32 }}>
 
                 {/* STEP 0 — Your Details */}
                 {step === 0 && (
@@ -202,7 +212,11 @@ export default function Contact() {
                         value={form.name} onChange={e => set('name', e.target.value)}
                         style={inputStyle} onFocus={focus} onBlur={blur} />
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+                      gap: 14, marginBottom: 18,
+                    }}>
                       <div>
                         <label style={labelStyle}>Phone *</label>
                         <input type="tel" placeholder="Mobile number" required
@@ -222,7 +236,12 @@ export default function Contact() {
                 {/* STEP 1 — Stay Dates */}
                 {step === 1 && (
                   <div>
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
+                    {/* Date inputs: 2 cols desktop, 1 col ≤480px */}
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr',
+                      gap: 14, marginBottom: 18,
+                    }}>
                       <div>
                         <label style={labelStyle}>Check-in *</label>
                         <input type="date" required min={today}
@@ -254,35 +273,47 @@ export default function Contact() {
                       </div>
                     )}
 
-                    {/* Guests counter */}
+                    {/* Guests counter — fits on all screens */}
                     <div>
                       <label style={labelStyle}>Number of Guests *</label>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        {[-1, null, 1].map((delta, i) => delta === null ? (
-                          <div key="display" style={{
-                            flex: 1, textAlign: 'center', padding: '13px',
-                            background: 'rgba(8,14,20,0.6)', border: '1px solid rgba(17,104,133,0.3)',
-                            borderRadius: 12, fontFamily: '"Space Grotesk", sans-serif',
-                            fontSize: '1.1rem', fontWeight: 700, color: '#ffffff',
-                          }}>
-                            {form.guests} {form.guests === 1 ? 'Guest' : 'Guests'}
-                          </div>
-                        ) : (
-                          <button key={delta} type="button"
-                            onClick={() => set('guests', Math.min(20, Math.max(1, form.guests + delta)))}
-                            style={{
-                              width: 46, height: 46, borderRadius: 10, flexShrink: 0,
-                              background: 'rgba(17,104,133,0.2)', border: '1px solid rgba(17,104,133,0.35)',
-                              color: '#e8f4f8', fontSize: '1.4rem', cursor: 'pointer',
-                              display: 'flex', alignItems: 'center', justifyContent: 'center',
-                              transition: 'all 0.2s',
-                            }}
-                            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,229,255,0.15)'; e.currentTarget.style.borderColor = '#00e5ff' }}
-                            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(17,104,133,0.2)'; e.currentTarget.style.borderColor = 'rgba(17,104,133,0.35)' }}
-                          >
-                            {delta < 0 ? '−' : '+'}
-                          </button>
-                        ))}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <button type="button"
+                          onClick={() => set('guests', Math.max(1, form.guests - 1))}
+                          style={{
+                            width: 44, height: 44, borderRadius: 10, flexShrink: 0,
+                            background: 'rgba(17,104,133,0.2)', border: '1px solid rgba(17,104,133,0.35)',
+                            color: '#e8f4f8', fontSize: '1.4rem', cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            transition: 'all 0.2s',
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,229,255,0.15)'; e.currentTarget.style.borderColor = '#00e5ff' }}
+                          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(17,104,133,0.2)'; e.currentTarget.style.borderColor = 'rgba(17,104,133,0.35)' }}
+                        >
+                          −
+                        </button>
+                        <div style={{
+                          flex: 1, textAlign: 'center', padding: '13px 8px',
+                          background: 'rgba(8,14,20,0.6)', border: '1px solid rgba(17,104,133,0.3)',
+                          borderRadius: 12, fontFamily: '"Space Grotesk", sans-serif',
+                          fontSize: '1.1rem', fontWeight: 700, color: '#ffffff',
+                          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis',
+                        }}>
+                          {form.guests} {form.guests === 1 ? 'Guest' : 'Guests'}
+                        </div>
+                        <button type="button"
+                          onClick={() => set('guests', Math.min(20, form.guests + 1))}
+                          style={{
+                            width: 44, height: 44, borderRadius: 10, flexShrink: 0,
+                            background: 'rgba(17,104,133,0.2)', border: '1px solid rgba(17,104,133,0.35)',
+                            color: '#e8f4f8', fontSize: '1.4rem', cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            transition: 'all 0.2s',
+                          }}
+                          onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,229,255,0.15)'; e.currentTarget.style.borderColor = '#00e5ff' }}
+                          onMouseLeave={e => { e.currentTarget.style.background = 'rgba(17,104,133,0.2)'; e.currentTarget.style.borderColor = 'rgba(17,104,133,0.35)' }}
+                        >
+                          +
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -293,7 +324,8 @@ export default function Contact() {
                   <div>
                     <div style={{
                       background: 'rgba(0,229,255,0.05)', border: '1px solid rgba(0,229,255,0.15)',
-                      borderRadius: 14, padding: 20, marginBottom: 20,
+                      borderRadius: 14, padding: isMobile ? 14 : 20, marginBottom: 20,
+                      overflow: 'hidden',
                     }}>
                       <div style={{ fontSize: '0.7rem', color: '#00e5ff', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 16 }}>
                         Booking Summary
@@ -309,14 +341,21 @@ export default function Contact() {
                         ['👥 Guests', `${form.guests} guest${form.guests !== 1 ? 's' : ''}`],
                       ].filter(Boolean).map(([label, value]) => (
                         <div key={label} style={{
-                          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-                          padding: '9px 0', borderBottom: '1px solid rgba(17,104,133,0.15)',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          padding: '9px 0',
+                          borderBottom: '1px solid rgba(17,104,133,0.15)',
+                          gap: 8,
+                          flexWrap: isMobile ? 'wrap' : 'nowrap',
                         }}>
-                          <span style={{ fontSize: '0.82rem', color: '#7ba3b8' }}>{label}</span>
+                          <span style={{ fontSize: '0.82rem', color: '#7ba3b8', flexShrink: 0 }}>{label}</span>
                           <span style={{
-                            fontSize: '0.88rem', fontWeight: 600, color: '#ffffff',
+                            fontSize: '0.88rem', fontWeight: 600,
                             fontFamily: label.includes('ID') ? '"Space Grotesk", sans-serif' : 'inherit',
                             color: label.includes('ID') ? '#00e5ff' : '#ffffff',
+                            wordBreak: 'break-all',
+                            textAlign: 'right',
                           }}>{value}</span>
                         </div>
                       ))}
@@ -365,7 +404,7 @@ export default function Contact() {
             <div style={{
               background: 'linear-gradient(145deg, #0f1e2d, #0a1520)',
               border: '1px solid rgba(0,229,255,0.3)',
-              borderRadius: 24, padding: 48, textAlign: 'center',
+              borderRadius: 24, padding: isMobile ? 28 : 48, textAlign: 'center',
               boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 60px rgba(0,229,255,0.1)',
             }}>
               <div style={{ fontSize: '3.5rem', marginBottom: 20 }}>🎉</div>
@@ -378,6 +417,7 @@ export default function Contact() {
                 color: '#00e5ff', background: 'rgba(0,229,255,0.1)',
                 border: '1px solid rgba(0,229,255,0.3)',
                 padding: '8px 20px', borderRadius: 10, marginBottom: 20, letterSpacing: '1px',
+                wordBreak: 'break-all',
               }}>
                 {bookingId}
               </div>

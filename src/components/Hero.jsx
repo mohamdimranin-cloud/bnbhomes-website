@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import Slider from './Slider'
+import { useResponsive } from '../hooks/useResponsive'
 
 const scrollTo = (id) =>
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -18,11 +18,12 @@ const heroImages = [
   '/images/room-5.webp',
   '/images/room-18.webp',
   '/images/room-21.webp',
-  '/images/room-27.webp',
 ]
 
 export default function Hero() {
+  const { isMobile, isTablet } = useResponsive()
   const [floors, setFloors] = useState(initialFloors)
+  const [imgIdx, setImgIdx] = useState(0)
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -37,6 +38,11 @@ export default function Hero() {
     return () => clearInterval(interval)
   }, [])
 
+  useEffect(() => {
+    const t = setInterval(() => setImgIdx((i) => (i + 1) % heroImages.length), 4000)
+    return () => clearInterval(t)
+  }, [])
+
   return (
     <section
       id="hero"
@@ -46,27 +52,23 @@ export default function Hero() {
         alignItems: 'center',
         position: 'relative',
         overflow: 'hidden',
-        padding: '100px 24px 60px',
+        padding: isMobile ? '100px 16px 60px' : '100px 24px 60px',
       }}
     >
-      {/* Full-screen sliding background */}
-      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
-        <Slider
-          images={heroImages}
-          autoPlay={4500}
-          height="100%"
-          overlay={true}
-          showDots={false}
-          showArrows={false}
-          objectFit="cover"
-        />
-      </div>
+      {/* Background room image */}
+      <div style={{
+        position: 'absolute', inset: 0, zIndex: 0,
+        backgroundImage: `url(${heroImages[imgIdx]})`,
+        backgroundSize: 'cover', backgroundPosition: 'center',
+        transition: 'background-image 1s ease',
+        filter: 'brightness(0.18) saturate(0.6)',
+      }} />
 
       {/* Grid overlay */}
-      <div className="hero-grid" style={{ zIndex: 1 }} />
+      <div className="hero-grid" />
       {/* Orbs */}
-      <div className="hero-orb hero-orb-1" style={{ zIndex: 1 }} />
-      <div className="hero-orb hero-orb-2" style={{ zIndex: 1 }} />
+      <div className="hero-orb hero-orb-1" />
+      <div className="hero-orb hero-orb-2" />
 
       {/* Content wrapper */}
       <div
@@ -75,15 +77,20 @@ export default function Hero() {
           margin: '0 auto',
           width: '100%',
           display: 'flex',
-          alignItems: 'center',
-          gap: 40,
-          flexWrap: 'wrap',
+          alignItems: isMobile ? 'flex-start' : 'center',
+          gap: isMobile ? 32 : 40,
+          flexDirection: isMobile ? 'column' : 'row',
           position: 'relative',
           zIndex: 2,
         }}
       >
         {/* Left: Text Content */}
-        <div style={{ flex: 1, minWidth: 280, maxWidth: 600 }}>
+        <div style={{
+          flex: 1,
+          minWidth: 0,
+          maxWidth: isMobile ? '100%' : 600,
+          wordBreak: 'break-word',
+        }}>
           {/* Badge */}
           <div
             style={{
@@ -109,12 +116,13 @@ export default function Hero() {
           <h1
             style={{
               fontFamily: '"Space Grotesk", sans-serif',
-              fontSize: 'clamp(3rem, 6vw, 5rem)',
+              fontSize: isMobile ? 'clamp(2.2rem, 10vw, 3.5rem)' : 'clamp(3rem, 6vw, 5rem)',
               fontWeight: 800,
               lineHeight: 1.05,
               color: '#ffffff',
               marginBottom: 24,
               letterSpacing: -1,
+              wordBreak: 'break-word',
             }}
           >
             Stay Beyond<br />
@@ -124,19 +132,26 @@ export default function Hero() {
           {/* Subtitle */}
           <p
             style={{
-              fontSize: '1.1rem',
+              fontSize: isMobile ? '1rem' : '1.1rem',
               color: '#7ba3b8',
               lineHeight: 1.7,
               marginBottom: 40,
               maxWidth: 480,
+              wordBreak: 'break-word',
             }}
           >
-            Premium studio and suite rooms in the heart of Kazhakootam.<br />
+            Premium studio and suite rooms in the heart of Kazhakootam.
             Modern comfort, transparent pricing, and a home away from home.
           </p>
 
           {/* Actions */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 56, flexWrap: 'wrap' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 12,
+            marginBottom: 48,
+            flexWrap: 'wrap',
+          }}>
             <button className="btn-primary" onClick={() => scrollTo('contact')}>
               Book a Room
             </button>
@@ -146,7 +161,13 @@ export default function Hero() {
           </div>
 
           {/* Stats */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 32, flexWrap: 'wrap' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: isMobile ? 16 : 32,
+            flexWrap: 'wrap',
+            rowGap: 16,
+          }}>
             {[
               { num: '31+', label: 'Rooms' },
               null,
@@ -157,7 +178,7 @@ export default function Hero() {
               item === null ? (
                 <div
                   key={i}
-                  style={{ width: 1, height: 40, background: 'rgba(17,104,133,0.25)' }}
+                  style={{ width: 1, height: 40, background: 'rgba(17,104,133,0.25)', flexShrink: 0 }}
                 />
               ) : (
                 <div key={i} style={{ textAlign: 'center' }}>
@@ -165,7 +186,7 @@ export default function Hero() {
                     style={{
                       display: 'block',
                       fontFamily: '"Space Grotesk", sans-serif',
-                      fontSize: '1.8rem',
+                      fontSize: isMobile ? '1.4rem' : '1.8rem',
                       fontWeight: 700,
                       color: '#ffffff',
                     }}
@@ -191,14 +212,15 @@ export default function Hero() {
         {/* Right: Building Card */}
         <div
           style={{
-            flex: 1,
+            flex: isMobile ? 'none' : 1,
+            width: isMobile ? '100%' : 'auto',
             display: 'flex',
             justifyContent: 'center',
             alignItems: 'center',
-            minWidth: 280,
+            minWidth: 0,
           }}
         >
-          <div className="building-card">
+          <div className="building-card" style={{ width: '100%', maxWidth: isMobile ? '100%' : 340 }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
               {floors.map((floor) => (
                 <div
@@ -212,6 +234,7 @@ export default function Hero() {
                     borderRadius: 10,
                     border: '1px solid rgba(17,104,133,0.25)',
                     transition: 'border-color 0.2s',
+                    gap: 8,
                   }}
                   onMouseEnter={(e) =>
                     (e.currentTarget.style.borderColor = '#116885')
@@ -220,10 +243,10 @@ export default function Hero() {
                     (e.currentTarget.style.borderColor = 'rgba(17,104,133,0.25)')
                   }
                 >
-                  <span style={{ fontSize: '0.75rem', color: '#7ba3b8', fontWeight: 500 }}>
+                  <span style={{ fontSize: '0.75rem', color: '#7ba3b8', fontWeight: 500, flexShrink: 0 }}>
                     {floor.label}
                   </span>
-                  <div style={{ display: 'flex', gap: 6 }}>
+                  <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                     {floor.dots.map((occupied, di) => (
                       <span
                         key={di}
@@ -253,7 +276,7 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* Scroll Hint */}
+      {/* Scroll Hint — desktop only */}
       <div
         className="hidden md:flex"
         style={{

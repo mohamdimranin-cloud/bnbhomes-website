@@ -1,3 +1,5 @@
+import { useResponsive } from '../hooks/useResponsive'
+
 const nearby = [
   'Technopark Phase III',
   'UST Global',
@@ -7,14 +9,16 @@ const nearby = [
 ]
 
 export default function Location() {
+  const { isMobile } = useResponsive()
+
   return (
     <section id="location" style={{ padding: '100px 0' }}>
       <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px' }}>
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-            gap: 64,
+            gridTemplateColumns: isMobile ? '1fr' : 'repeat(2, 1fr)',
+            gap: isMobile ? 40 : 64,
             alignItems: 'start',
           }}
         >
@@ -33,7 +37,7 @@ export default function Location() {
             >
               Right in the<br /><span className="gradient-text">Heart of the City</span>
             </h2>
-            <p style={{ color: '#7ba3b8', lineHeight: 1.7, margin: '20px 0 32px' }}>
+            <p style={{ color: '#7ba3b8', lineHeight: 1.7, margin: '20px 0 32px', wordBreak: 'break-word' }}>
               Strategically located at Kazhakootam — Trivandrum's fastest growing tech and
               residential hub. Minutes from IT parks, hospitals, and the city center.
             </p>
@@ -50,15 +54,17 @@ export default function Location() {
                 display: 'flex',
                 flexDirection: 'column',
                 gap: 16,
+                minWidth: 0,
+                overflow: 'hidden',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, fontSize: '0.9rem', color: '#7ba3b8' }}>
                 <span style={{ fontSize: '1.1rem', flexShrink: 0, marginTop: 1 }}>📍</span>
-                <span>518/4, Phoenix Lane, Thirupathapuram Jn,<br />Kazhakootam, Trivandrum, Kerala</span>
+                <span style={{ wordBreak: 'break-word' }}>518/4, Phoenix Lane, Thirupathapuram Jn,<br />Kazhakootam, Trivandrum, Kerala</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, fontSize: '0.9rem', color: '#7ba3b8' }}>
                 <span style={{ fontSize: '1.1rem', flexShrink: 0, marginTop: 1 }}>📱</span>
-                <span>
+                <span style={{ wordBreak: 'break-word' }}>
                   <a href="tel:7540000750" style={{ color: '#1a8fb5' }}>7540000750</a>
                   &nbsp;|&nbsp;
                   <a href="tel:04713567506" style={{ color: '#1a8fb5' }}>0471 3567506</a>
@@ -66,7 +72,7 @@ export default function Location() {
               </div>
               <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, fontSize: '0.9rem', color: '#7ba3b8' }}>
                 <span style={{ fontSize: '1.1rem', flexShrink: 0, marginTop: 1 }}>✉️</span>
-                <a href="mailto:bnbhomestvm@gmail.com" style={{ color: '#1a8fb5' }}>
+                <a href="mailto:bnbhomestvm@gmail.com" style={{ color: '#1a8fb5', wordBreak: 'break-all' }}>
                   bnbhomestvm@gmail.com
                 </a>
               </div>
@@ -97,6 +103,7 @@ export default function Location() {
                       border: '1px solid rgba(17,104,133,0.25)',
                       borderRadius: 100,
                       color: '#7ba3b8',
+                      whiteSpace: 'nowrap',
                     }}
                   >
                     {tag}
@@ -106,17 +113,19 @@ export default function Location() {
             </div>
           </div>
 
-          {/* Right: Map */}
-          <div>
+          {/* Right: Map — stacks below on mobile */}
+          <div style={{ minWidth: 0, overflow: 'hidden' }}>
             <iframe
               src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3943.8!2d76.8730!3d8.5674!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zOCozNCcwMi4yIk4gNzLCsDUyJzIyLjgiRQ!5e0!3m2!1sen!2sin!4v1"
               width="100%"
-              height="400"
+              height={isMobile ? 280 : 400}
               style={{
                 border: 0,
                 borderRadius: 16,
                 boxShadow: '0 4px 32px rgba(0,0,0,0.4)',
                 outline: '1px solid rgba(17,104,133,0.25)',
+                display: 'block',
+                maxWidth: '100%',
               }}
               allowFullScreen=""
               loading="lazy"
