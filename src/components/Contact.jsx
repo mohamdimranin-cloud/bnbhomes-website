@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 const contactMethods = [
   { icon: '📱', label: 'Call / WhatsApp', value: '7540000750', href: 'tel:7540000750' },
@@ -6,67 +6,88 @@ const contactMethods = [
   { icon: '✉️', label: 'Email', value: 'bnbhomestvm@gmail.com', href: 'mailto:bnbhomestvm@gmail.com' },
 ]
 
+/** Generate a unique booking reference: BNB-YYYYMMDD-XXXX */
+function generateBookingId() {
+  const now = new Date()
+  const date = now.toISOString().slice(0, 10).replace(/-/g, '')
+  const rand = Math.random().toString(36).substring(2, 6).toUpperCase()
+  return `BNB-${date}-${rand}`
+}
+
+const STEPS = ['Your Details', 'Stay Dates', 'Confirm']
+
 export default function Contact() {
   const today = new Date().toISOString().split('T')[0]
-
-  const [form, setForm] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    checkin: '',
-    checkout: '',
-    guests: '1',
-  })
+  const [step, setStep] = useState(0)
+  const [bookingId] = useState(generateBookingId)
   const [submitted, setSubmitted] = useState(false)
 
-  const set = (e) => setForm((p) => ({ ...p, [e.target.name]: e.target.value }))
+  const [form, setForm] = useState({
+    name: '', phone: '', email: '',
+    checkin: '', checkout: '', guests: 1,
+  })
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const set = (key, val) => setForm(p => ({ ...p, [key]: val }))
+
+  // Auto-advance checkout if checkin changes and checkout is before it
+  useEffect(() => {
+    if (form.checkin && form.checkout && form.checkout <= form.checkin) {
+      const d = new Date(form.checkin)
+      d.setDate(d.getDate() + 1)
+      set('checkout', d.toISOString().slice(0, 10))
+    }
+  }, [form.checkin])
+
+  const nights = form.checkin && form.checkout
+    ? Math.max(0, Math.round((new Date(form.checkout) - new Date(form.checkin)) / 86400000))
+    : 0
+
+  const handleSubmit = () => {
     const { name, phone, email, checkin, checkout, guests } = form
     const waText = encodeURIComponent(
-      `Hi BnB Homes! I'd like to make an advance booking.\n\n` +
-      `Name: ${name}\n` +
-      `Phone: ${phone}\n` +
-      `Email: ${email || 'N/A'}\n` +
-      `Check-in: ${checkin}\n` +
-      `Check-out: ${checkout}\n` +
-      `Number of Guests: ${guests}`
+      `🏨 *BnB Homes — Advance Booking Request*\n\n` +
+      `📋 Booking ID: *${bookingId}*\n` +
+      `👤 Name: ${name}\n` +
+      `📱 Phone: ${phone}\n` +
+      `✉️ Email: ${email || 'N/A'}\n` +
+      `📅 Check-in: ${checkin}\n` +
+      `📅 Check-out: ${checkout}\n` +
+      `🌙 Nights: ${nights}\n` +
+      `👥 Guests: ${guests}\n\n` +
+      `Please confirm availability. Thank you!`
     )
     setSubmitted(true)
     setTimeout(() => {
       window.open(`https://wa.me/917540000750?text=${waText}`, '_blank')
-      setForm({ name: '', phone: '', email: '', checkin: '', checkout: '', guests: '1' })
-      setSubmitted(false)
-    }, 1200)
+    }, 800)
+  }
+
+  // Validation per step
+  const canNext = () => {
+    if (step === 0) return form.name.trim() && form.phone.trim()
+    if (step === 1) return form.checkin && form.checkout && nights > 0
+    return true
   }
 
   const inputStyle = {
-    padding: '12px 16px',
-    background: '#0d1821',
-    border: '1px solid rgba(17,104,133,0.25)',
-    borderRadius: 10,
+    padding: '13px 16px',
+    background: 'rgba(8,14,20,0.6)',
+    border: '1px solid rgba(17,104,133,0.3)',
+    borderRadius: 12,
     color: '#e8f4f8',
-    fontSize: '0.9rem',
+    fontSize: '0.95rem',
     fontFamily: 'Inter, sans-serif',
     outline: 'none',
-    transition: 'border-color 0.2s',
+    transition: 'all 0.2s',
     width: '100%',
     WebkitAppearance: 'none',
   }
-
   const labelStyle = {
-    display: 'block',
-    fontSize: '0.78rem',
-    fontWeight: 600,
-    color: '#7ba3b8',
-    textTransform: 'uppercase',
-    letterSpacing: '0.5px',
-    marginBottom: 8,
+    display: 'block', fontSize: '0.75rem', fontWeight: 600,
+    color: '#7ba3b8', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: 8,
   }
-
-  const focus = (e) => (e.target.style.borderColor = '#1a8fb5')
-  const blur  = (e) => (e.target.style.borderColor = 'rgba(17,104,133,0.25)')
+  const focus = e => { e.target.style.borderColor = '#00e5ff'; e.target.style.boxShadow = '0 0 0 3px rgba(0,229,255,0.1)' }
+  const blur  = e => { e.target.style.borderColor = 'rgba(17,104,133,0.3)'; e.target.style.boxShadow = 'none' }
 
   return (
     <section id="contact" style={{ padding: '100px 0', background: '#0d1821' }}>
@@ -74,11 +95,10 @@ export default function Contact() {
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
-          gap: 64,
-          alignItems: 'start',
+          gap: 64, alignItems: 'start',
         }}>
 
-          {/* Left — contact info */}
+          {/* ── LEFT: contact info ── */}
           <div>
             <span className="section-tag">Get in Touch</span>
             <h2 style={{
@@ -89,23 +109,22 @@ export default function Contact() {
               Ready to<br /><span className="gradient-text">Book Your Stay?</span>
             </h2>
             <p style={{ color: '#7ba3b8', lineHeight: 1.7, margin: '20px 0 32px' }}>
-              Call us, WhatsApp us, or fill the advance booking form — we'll confirm within minutes.
+              Fill the advance booking form and we'll confirm your room via WhatsApp within minutes.
             </p>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-              {contactMethods.map((m) => (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+              {contactMethods.map(m => (
                 <a key={m.label} href={m.href} className="animate-card" style={{
                   display: 'flex', alignItems: 'center', gap: 16,
                   padding: '16px 20px', background: '#0f1e2d',
-                  border: '1px solid rgba(17,104,133,0.25)', borderRadius: 10,
+                  border: '1px solid rgba(17,104,133,0.25)', borderRadius: 12,
                   transition: 'all 0.3s', textDecoration: 'none',
                 }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#1a8fb5'; e.currentTarget.style.transform = 'translateX(4px)' }}
-                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = 'rgba(17,104,133,0.25)'; e.currentTarget.style.transform = 'translateX(0)' }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = '#1a8fb5'; e.currentTarget.style.transform = 'translateX(6px)' }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = 'rgba(17,104,133,0.25)'; e.currentTarget.style.transform = 'translateX(0)' }}
                 >
                   <span style={{ fontSize: '1.5rem' }}>{m.icon}</span>
-                  <div style={{ display: 'flex', flexDirection: 'column' }}>
-                    <strong style={{ fontSize: '0.85rem', color: '#ffffff', fontWeight: 600 }}>{m.label}</strong>
+                  <div>
+                    <strong style={{ display: 'block', fontSize: '0.83rem', color: '#ffffff', fontWeight: 600 }}>{m.label}</strong>
                     <span style={{ fontSize: '0.9rem', color: '#1a8fb5' }}>{m.value}</span>
                   </div>
                 </a>
@@ -113,131 +132,264 @@ export default function Contact() {
             </div>
           </div>
 
-          {/* Right — advance booking form */}
-          <div style={{
-            background: '#0f1e2d',
-            border: '1px solid rgba(17,104,133,0.3)',
-            borderRadius: 20, padding: 36,
-            boxShadow: '0 4px 32px rgba(0,0,0,0.3)',
-          }}>
-            {/* Header */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 8 }}>
+          {/* ── RIGHT: booking card ── */}
+          {!submitted ? (
+            <div style={{
+              background: 'linear-gradient(145deg, #0f1e2d, #0a1520)',
+              border: '1px solid rgba(17,104,133,0.35)',
+              borderRadius: 24, overflow: 'hidden',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 60px rgba(17,104,133,0.1)',
+            }}>
+
+              {/* Card header */}
               <div style={{
-                width: 40, height: 40, borderRadius: 10,
-                background: 'linear-gradient(135deg, #116885, #1a8fb5)',
-                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                fontSize: '1.2rem',
-              }}>📅</div>
-              <div>
-                <h3 style={{
-                  fontFamily: '"Space Grotesk", sans-serif',
-                  fontSize: '1.3rem', fontWeight: 700, color: '#ffffff', margin: 0,
-                }}>Advance Booking</h3>
-                <p style={{ fontSize: '0.8rem', color: '#7ba3b8', margin: 0 }}>
-                  Reserve your room — we'll confirm via WhatsApp
-                </p>
+                background: 'linear-gradient(135deg, #116885, #0c4d62)',
+                padding: '24px 32px',
+                position: 'relative', overflow: 'hidden',
+              }}>
+                {/* decorative circles */}
+                <div style={{ position: 'absolute', top: -30, right: -30, width: 120, height: 120, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
+                <div style={{ position: 'absolute', top: 10, right: 20, width: 60, height: 60, borderRadius: '50%', background: 'rgba(0,229,255,0.08)' }} />
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', position: 'relative' }}>
+                  <div>
+                    <div style={{ fontSize: '0.7rem', color: 'rgba(255,255,255,0.6)', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 6 }}>
+                      Advance Booking
+                    </div>
+                    <h3 style={{ fontFamily: '"Space Grotesk", sans-serif', fontSize: '1.4rem', fontWeight: 700, color: '#fff', margin: 0 }}>
+                      Reserve Your Room
+                    </h3>
+                  </div>
+                  <div style={{ textAlign: 'right' }}>
+                    <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.5)', marginBottom: 4, letterSpacing: '1px' }}>BOOKING ID</div>
+                    <div style={{
+                      fontFamily: '"Space Grotesk", sans-serif',
+                      fontSize: '0.85rem', fontWeight: 700, color: '#00e5ff',
+                      background: 'rgba(0,229,255,0.12)', border: '1px solid rgba(0,229,255,0.3)',
+                      padding: '4px 10px', borderRadius: 8, letterSpacing: '1px',
+                    }}>
+                      {bookingId}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Step progress bar */}
+                <div style={{ marginTop: 20, display: 'flex', gap: 8 }}>
+                  {STEPS.map((s, i) => (
+                    <div key={s} style={{ flex: 1 }}>
+                      <div style={{
+                        height: 3, borderRadius: 2,
+                        background: i <= step ? '#00e5ff' : 'rgba(255,255,255,0.2)',
+                        transition: 'background 0.4s',
+                      }} />
+                      <div style={{ fontSize: '0.65rem', color: i <= step ? '#00e5ff' : 'rgba(255,255,255,0.4)', marginTop: 5, textAlign: 'center', letterSpacing: '0.5px' }}>
+                        {s}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Card body */}
+              <div style={{ padding: 32 }}>
+
+                {/* STEP 0 — Your Details */}
+                {step === 0 && (
+                  <div>
+                    <div style={{ marginBottom: 18 }}>
+                      <label style={labelStyle}>Full Name *</label>
+                      <input type="text" placeholder="Your full name" required
+                        value={form.name} onChange={e => set('name', e.target.value)}
+                        style={inputStyle} onFocus={focus} onBlur={blur} />
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
+                      <div>
+                        <label style={labelStyle}>Phone *</label>
+                        <input type="tel" placeholder="Mobile number" required
+                          value={form.phone} onChange={e => set('phone', e.target.value)}
+                          style={inputStyle} onFocus={focus} onBlur={blur} />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>Email</label>
+                        <input type="email" placeholder="your@email.com"
+                          value={form.email} onChange={e => set('email', e.target.value)}
+                          style={inputStyle} onFocus={focus} onBlur={blur} />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* STEP 1 — Stay Dates */}
+                {step === 1 && (
+                  <div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
+                      <div>
+                        <label style={labelStyle}>Check-in *</label>
+                        <input type="date" required min={today}
+                          value={form.checkin} onChange={e => set('checkin', e.target.value)}
+                          style={inputStyle} onFocus={focus} onBlur={blur} />
+                      </div>
+                      <div>
+                        <label style={labelStyle}>Check-out *</label>
+                        <input type="date" required min={form.checkin || today}
+                          value={form.checkout} onChange={e => set('checkout', e.target.value)}
+                          style={inputStyle} onFocus={focus} onBlur={blur} />
+                      </div>
+                    </div>
+
+                    {/* Nights badge */}
+                    {nights > 0 && (
+                      <div style={{
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10,
+                        padding: '12px 20px', borderRadius: 12, marginBottom: 18,
+                        background: 'rgba(0,229,255,0.08)', border: '1px solid rgba(0,229,255,0.2)',
+                      }}>
+                        <span style={{ fontSize: '1.3rem' }}>🌙</span>
+                        <span style={{ fontFamily: '"Space Grotesk", sans-serif', fontWeight: 700, fontSize: '1.1rem', color: '#00e5ff' }}>
+                          {nights}
+                        </span>
+                        <span style={{ color: '#7ba3b8', fontSize: '0.9rem' }}>
+                          {nights === 1 ? 'Night' : 'Nights'}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Guests counter */}
+                    <div>
+                      <label style={labelStyle}>Number of Guests *</label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                        {[-1, null, 1].map((delta, i) => delta === null ? (
+                          <div key="display" style={{
+                            flex: 1, textAlign: 'center', padding: '13px',
+                            background: 'rgba(8,14,20,0.6)', border: '1px solid rgba(17,104,133,0.3)',
+                            borderRadius: 12, fontFamily: '"Space Grotesk", sans-serif',
+                            fontSize: '1.1rem', fontWeight: 700, color: '#ffffff',
+                          }}>
+                            {form.guests} {form.guests === 1 ? 'Guest' : 'Guests'}
+                          </div>
+                        ) : (
+                          <button key={delta} type="button"
+                            onClick={() => set('guests', Math.min(20, Math.max(1, form.guests + delta)))}
+                            style={{
+                              width: 46, height: 46, borderRadius: 10, flexShrink: 0,
+                              background: 'rgba(17,104,133,0.2)', border: '1px solid rgba(17,104,133,0.35)',
+                              color: '#e8f4f8', fontSize: '1.4rem', cursor: 'pointer',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              transition: 'all 0.2s',
+                            }}
+                            onMouseEnter={e => { e.currentTarget.style.background = 'rgba(0,229,255,0.15)'; e.currentTarget.style.borderColor = '#00e5ff' }}
+                            onMouseLeave={e => { e.currentTarget.style.background = 'rgba(17,104,133,0.2)'; e.currentTarget.style.borderColor = 'rgba(17,104,133,0.35)' }}
+                          >
+                            {delta < 0 ? '−' : '+'}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* STEP 2 — Confirm summary */}
+                {step === 2 && (
+                  <div>
+                    <div style={{
+                      background: 'rgba(0,229,255,0.05)', border: '1px solid rgba(0,229,255,0.15)',
+                      borderRadius: 14, padding: 20, marginBottom: 20,
+                    }}>
+                      <div style={{ fontSize: '0.7rem', color: '#00e5ff', letterSpacing: '2px', textTransform: 'uppercase', marginBottom: 16 }}>
+                        Booking Summary
+                      </div>
+                      {[
+                        ['🔖 Booking ID', bookingId],
+                        ['👤 Name', form.name],
+                        ['📱 Phone', form.phone],
+                        form.email ? ['✉️ Email', form.email] : null,
+                        ['📅 Check-in', form.checkin],
+                        ['📅 Check-out', form.checkout],
+                        ['🌙 Nights', `${nights} night${nights !== 1 ? 's' : ''}`],
+                        ['👥 Guests', `${form.guests} guest${form.guests !== 1 ? 's' : ''}`],
+                      ].filter(Boolean).map(([label, value]) => (
+                        <div key={label} style={{
+                          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                          padding: '9px 0', borderBottom: '1px solid rgba(17,104,133,0.15)',
+                        }}>
+                          <span style={{ fontSize: '0.82rem', color: '#7ba3b8' }}>{label}</span>
+                          <span style={{
+                            fontSize: '0.88rem', fontWeight: 600, color: '#ffffff',
+                            fontFamily: label.includes('ID') ? '"Space Grotesk", sans-serif' : 'inherit',
+                            color: label.includes('ID') ? '#00e5ff' : '#ffffff',
+                          }}>{value}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <p style={{ fontSize: '0.8rem', color: '#7ba3b8', textAlign: 'center', lineHeight: 1.6 }}>
+                      By confirming, you'll be redirected to WhatsApp to send this booking request to our team.
+                    </p>
+                  </div>
+                )}
+
+                {/* Navigation buttons */}
+                <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+                  {step > 0 && (
+                    <button type="button" onClick={() => setStep(s => s - 1)}
+                      className="btn-ghost"
+                      style={{ flex: 1, justifyContent: 'center', padding: '14px' }}
+                    >
+                      ← Back
+                    </button>
+                  )}
+                  {step < 2 ? (
+                    <button type="button"
+                      onClick={() => { if (canNext()) setStep(s => s + 1) }}
+                      className="btn-primary"
+                      style={{
+                        flex: 1, justifyContent: 'center', padding: '14px', border: 'none',
+                        opacity: canNext() ? 1 : 0.5, cursor: canNext() ? 'pointer' : 'not-allowed',
+                      }}
+                    >
+                      Next →
+                    </button>
+                  ) : (
+                    <button type="button" onClick={handleSubmit}
+                      className="btn-primary"
+                      style={{ flex: 1, justifyContent: 'center', padding: '14px', border: 'none', fontSize: '1rem' }}
+                    >
+                      📲 Confirm on WhatsApp
+                    </button>
+                  )}
+                </div>
+
               </div>
             </div>
-
-            <div style={{ height: 1, background: 'rgba(17,104,133,0.2)', margin: '20px 0 24px' }} />
-
-            <form onSubmit={handleSubmit}>
-
-              {/* Name */}
-              <div style={{ marginBottom: 18 }}>
-                <label style={labelStyle}>Full Name *</label>
-                <input type="text" name="name" placeholder="Your full name"
-                  required value={form.name} onChange={set}
-                  style={inputStyle} onFocus={focus} onBlur={blur} />
+          ) : (
+            /* ── Success card ── */
+            <div style={{
+              background: 'linear-gradient(145deg, #0f1e2d, #0a1520)',
+              border: '1px solid rgba(0,229,255,0.3)',
+              borderRadius: 24, padding: 48, textAlign: 'center',
+              boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 60px rgba(0,229,255,0.1)',
+            }}>
+              <div style={{ fontSize: '3.5rem', marginBottom: 20 }}>🎉</div>
+              <h3 style={{ fontFamily: '"Space Grotesk", sans-serif', fontSize: '1.5rem', fontWeight: 700, color: '#ffffff', marginBottom: 12 }}>
+                Booking Request Sent!
+              </h3>
+              <div style={{
+                display: 'inline-block',
+                fontFamily: '"Space Grotesk", sans-serif', fontSize: '1rem', fontWeight: 700,
+                color: '#00e5ff', background: 'rgba(0,229,255,0.1)',
+                border: '1px solid rgba(0,229,255,0.3)',
+                padding: '8px 20px', borderRadius: 10, marginBottom: 20, letterSpacing: '1px',
+              }}>
+                {bookingId}
               </div>
-
-              {/* Phone + Email */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
-                <div>
-                  <label style={labelStyle}>Phone Number *</label>
-                  <input type="tel" name="phone" placeholder="Mobile number"
-                    required value={form.phone} onChange={set}
-                    style={inputStyle} onFocus={focus} onBlur={blur} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Email</label>
-                  <input type="email" name="email" placeholder="Email address"
-                    value={form.email} onChange={set}
-                    style={inputStyle} onFocus={focus} onBlur={blur} />
-                </div>
-              </div>
-
-              {/* Check-in + Check-out */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 18 }}>
-                <div>
-                  <label style={labelStyle}>Check-in Date *</label>
-                  <input type="date" name="checkin" required min={today}
-                    value={form.checkin} onChange={set}
-                    style={inputStyle} onFocus={focus} onBlur={blur} />
-                </div>
-                <div>
-                  <label style={labelStyle}>Check-out Date *</label>
-                  <input type="date" name="checkout" required
-                    min={form.checkin || today}
-                    value={form.checkout} onChange={set}
-                    style={inputStyle} onFocus={focus} onBlur={blur} />
-                </div>
-              </div>
-
-              {/* Number of Guests */}
-              <div style={{ marginBottom: 28 }}>
-                <label style={labelStyle}>Number of Guests *</label>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                  <button type="button"
-                    onClick={() => setForm(p => ({ ...p, guests: String(Math.max(1, Number(p.guests) - 1)) }))}
-                    style={{
-                      width: 40, height: 40, borderRadius: 8,
-                      background: 'rgba(17,104,133,0.2)', border: '1px solid rgba(17,104,133,0.3)',
-                      color: '#e8f4f8', fontSize: '1.3rem', cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      transition: 'background 0.2s',
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(17,104,133,0.4)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'rgba(17,104,133,0.2)'}
-                  >−</button>
-                  <div style={{
-                    flex: 1, textAlign: 'center',
-                    padding: '12px 16px', background: '#0d1821',
-                    border: '1px solid rgba(17,104,133,0.25)', borderRadius: 10,
-                    fontSize: '1.1rem', fontWeight: 600, color: '#ffffff',
-                  }}>
-                    {form.guests} {Number(form.guests) === 1 ? 'Guest' : 'Guests'}
-                  </div>
-                  <button type="button"
-                    onClick={() => setForm(p => ({ ...p, guests: String(Math.min(20, Number(p.guests) + 1)) }))}
-                    style={{
-                      width: 40, height: 40, borderRadius: 8,
-                      background: 'rgba(17,104,133,0.2)', border: '1px solid rgba(17,104,133,0.3)',
-                      color: '#e8f4f8', fontSize: '1.3rem', cursor: 'pointer',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      transition: 'background 0.2s',
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(17,104,133,0.4)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'rgba(17,104,133,0.2)'}
-                  >+</button>
-                </div>
-              </div>
-
-              {/* Submit */}
-              <button type="submit" className="btn-primary"
-                style={{ width: '100%', justifyContent: 'center', fontSize: '1rem', padding: '16px', border: 'none' }}
-              >
-                📅 Confirm Advance Booking
+              <p style={{ color: '#7ba3b8', lineHeight: 1.7, marginBottom: 28 }}>
+                Opening WhatsApp to confirm your reservation with our team. We'll get back to you shortly!
+              </p>
+              <button onClick={() => { setSubmitted(false); setStep(0) }}
+                className="btn-ghost" style={{ justifyContent: 'center' }}>
+                Make Another Booking
               </button>
-
-              {submitted && (
-                <p style={{ marginTop: 12, fontSize: '0.85rem', textAlign: 'center', color: '#22c55e' }}>
-                  ✓ Opening WhatsApp to confirm your booking...
-                </p>
-              )}
-
-            </form>
-          </div>
+            </div>
+          )}
 
         </div>
       </div>
