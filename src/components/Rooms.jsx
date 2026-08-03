@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react'
 import LazyImage from './LazyImage'
+import Slider from './Slider'
 
 const scrollTo = (id) =>
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -102,26 +103,19 @@ function RoomCard({ room, index }) {
         e.currentTarget.style.boxShadow = 'none'
       }}
     >
-      {/* Room image */}
+      {/* Room image slider */}
       <div style={{ position: 'relative', height: 200 }}>
-        <LazyImage
-          src={room.images[0]}
-          alt={room.name}
-          style={{ height: 200 }}
-          imgStyle={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        <Slider
+          images={room.images}
+          autoPlay={3000}
+          height={200}
+          showDots={true}
+          showArrows={true}
+          objectFit="cover"
         />
-        <div style={{
-          position: 'absolute', bottom: 10, right: 10,
-          background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)',
-          borderRadius: 20, padding: '3px 10px',
-          fontSize: '0.7rem', color: '#fff',
-          border: '1px solid rgba(255,255,255,0.15)',
-        }}>
-          📷 {room.images.length} photos
-        </div>
         {room.featured && (
           <div style={{
-            position: 'absolute', top: 10, left: 10,
+            position: 'absolute', top: 10, left: 10, zIndex: 10,
             fontSize: '0.7rem', fontWeight: 600,
             padding: '4px 12px',
             background: 'linear-gradient(135deg, #116885, #1a8fb5)',

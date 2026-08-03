@@ -1,8 +1,11 @@
 import { useState } from 'react'
 import LazyImage from './LazyImage'
+import Slider from './Slider'
 
-// All 31 webp images — fast loading
 const allImages = Array.from({ length: 31 }, (_, i) => `/images/room-${i + 1}.webp`)
+
+// First 8 images go in the featured slider at top
+const featuredImages = allImages.slice(0, 8)
 
 export default function Gallery() {
   const [selected, setSelected] = useState(null)
@@ -23,6 +26,23 @@ export default function Gallery() {
           <p style={{ fontSize: '1rem', color: '#7ba3b8', maxWidth: 480, margin: '0 auto' }}>
             Every room photographed to show you exactly what to expect — no surprises.
           </p>
+        </div>
+
+        {/* Featured slider */}
+        <div style={{
+          borderRadius: 20, overflow: 'hidden',
+          border: '1px solid rgba(17,104,133,0.3)',
+          marginBottom: 40,
+          boxShadow: '0 8px 48px rgba(0,0,0,0.5), 0 0 40px rgba(17,104,133,0.15)',
+        }}>
+          <Slider
+            images={featuredImages}
+            autoPlay={3500}
+            height={480}
+            showDots={true}
+            showArrows={true}
+            objectFit="cover"
+          />
         </div>
 
         {/* Masonry-style grid */}

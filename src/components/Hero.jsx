@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import Slider from './Slider'
 
 const scrollTo = (id) =>
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -11,18 +12,17 @@ const initialFloors = [
   { label: '1st Floor', dots: [false, false, true, false, false, false] },
 ]
 
-// Hero gallery — cycle through real room images (webp = fast)
 const heroImages = [
   '/images/room-1.webp',
   '/images/room-3.webp',
   '/images/room-5.webp',
   '/images/room-18.webp',
   '/images/room-21.webp',
+  '/images/room-27.webp',
 ]
 
 export default function Hero() {
   const [floors, setFloors] = useState(initialFloors)
-  const [imgIdx, setImgIdx] = useState(0)
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -37,12 +37,6 @@ export default function Hero() {
     return () => clearInterval(interval)
   }, [])
 
-  // Cycle hero images every 4s
-  useEffect(() => {
-    const t = setInterval(() => setImgIdx((i) => (i + 1) % heroImages.length), 4000)
-    return () => clearInterval(t)
-  }, [])
-
   return (
     <section
       id="hero"
@@ -55,20 +49,24 @@ export default function Hero() {
         padding: '100px 24px 60px',
       }}
     >
-      {/* Background room image */}
-      <div style={{
-        position: 'absolute', inset: 0, zIndex: 0,
-        backgroundImage: `url(${heroImages[imgIdx]})`,
-        backgroundSize: 'cover', backgroundPosition: 'center',
-        transition: 'background-image 1s ease',
-        filter: 'brightness(0.18) saturate(0.6)',
-      }} />
+      {/* Full-screen sliding background */}
+      <div style={{ position: 'absolute', inset: 0, zIndex: 0 }}>
+        <Slider
+          images={heroImages}
+          autoPlay={4500}
+          height="100%"
+          overlay={true}
+          showDots={false}
+          showArrows={false}
+          objectFit="cover"
+        />
+      </div>
 
       {/* Grid overlay */}
-      <div className="hero-grid" />
+      <div className="hero-grid" style={{ zIndex: 1 }} />
       {/* Orbs */}
-      <div className="hero-orb hero-orb-1" />
-      <div className="hero-orb hero-orb-2" />
+      <div className="hero-orb hero-orb-1" style={{ zIndex: 1 }} />
+      <div className="hero-orb hero-orb-2" style={{ zIndex: 1 }} />
 
       {/* Content wrapper */}
       <div
