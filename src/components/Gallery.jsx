@@ -1,6 +1,34 @@
 import Slider from './Slider'
 
-const allImages = Array.from({ length: 31 }, (_, i) => `/images/room-${i + 1}.webp`)
+// Unique room images — duplicates removed
+const allImages = [
+  '/images/room-1.webp',
+  '/images/room-2.webp',
+  '/images/room-3.webp',
+  '/images/room-4.webp',
+  '/images/room-5.webp',
+  '/images/room-6.webp',
+  '/images/room-7.webp',
+  '/images/room-8.webp',
+  '/images/room-9.webp',
+  '/images/room-10.webp',
+  '/images/room-12.webp',
+  '/images/room-14.webp',
+  '/images/room-16.webp',
+  '/images/room-18.webp',
+  '/images/room-19.webp',
+  '/images/room-20.webp',
+  '/images/room-21.webp',
+  '/images/room-22.webp',
+  '/images/room-23.webp',
+  '/images/room-24.webp',
+  '/images/room-25.webp',
+  '/images/room-26.webp',
+  '/images/room-27.webp',
+  '/images/room-29.webp',
+  '/images/room-30.webp',
+  '/images/room-31.webp',
+]
 
 export default function Gallery() {
   return (
