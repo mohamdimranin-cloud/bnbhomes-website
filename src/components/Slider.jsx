@@ -1,15 +1,15 @@
-import { useState, useEffect, useCallback } from 'react'
+﻿import { useState, useEffect, useCallback } from 'react'
 
 /**
  * Reusable image slider with smooth CSS slide transition.
  * Props:
- *   images        — array of src strings
- *   autoPlay      — ms interval (0 = no auto, default 3500)
- *   height        — container height (default '100%')
- *   overlay       — render a dark overlay on top (for hero bg use)
- *   showDots      — show dot indicators
- *   showArrows    — show prev/next arrows
- *   objectFit     — 'cover' | 'contain' (default 'cover')
+ *   images        ΓÇö array of src strings
+ *   autoPlay      ΓÇö ms interval (0 = no auto, default 3500)
+ *   height        ΓÇö container height (default '100%')
+ *   overlay       ΓÇö render a dark overlay on top (for hero bg use)
+ *   showDots      ΓÇö show dot indicators
+ *   showArrows    ΓÇö show prev/next arrows
+ *   objectFit     ΓÇö 'cover' | 'contain' (default 'cover')
  */
 export default function Slider({
   images = [],
@@ -103,7 +103,7 @@ export default function Slider({
           }}
             onMouseEnter={e => e.currentTarget.style.background = 'rgba(17,104,133,0.7)'}
             onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.45)'}
-          >‹</button>
+          >ΓÇ╣</button>
           <button onClick={next} aria-label="Next" style={{
             position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)',
             zIndex: 3, background: 'rgba(0,0,0,0.45)', border: '1px solid rgba(255,255,255,0.2)',
@@ -113,7 +113,7 @@ export default function Slider({
           }}
             onMouseEnter={e => e.currentTarget.style.background = 'rgba(17,104,133,0.7)'}
             onMouseLeave={e => e.currentTarget.style.background = 'rgba(0,0,0,0.45)'}
-          >›</button>
+          >ΓÇ║</button>
         </>
       )}
 
