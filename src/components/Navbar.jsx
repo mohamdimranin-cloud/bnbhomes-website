@@ -49,18 +49,17 @@ export default function Navbar() {
         <a
           href="#"
           onClick={(e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: 'smooth' }) }}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            fontFamily: '"Space Grotesk", sans-serif',
-            fontWeight: 700,
-            fontSize: '1.4rem',
-            textDecoration: 'none',
-          }}
+          style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}
         >
-          <span style={{ fontSize: '1.6rem', color: '#00e5ff' }}>⬡</span>
-          <span style={{ color: '#ffffff' }}>
+          <img
+            src="/logo.png"
+            alt="BnB Homes"
+            style={{ height: 40, width: 'auto', objectFit: 'contain' }}
+          />
+          <span style={{
+            fontFamily: '"Space Grotesk", sans-serif',
+            fontWeight: 700, fontSize: '1.3rem', color: '#ffffff',
+          }}>
             BnB <span style={{ color: '#00e5ff' }}>Homes</span>
           </span>
         </a>

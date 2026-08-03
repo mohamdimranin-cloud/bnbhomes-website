@@ -11,13 +11,13 @@ const initialFloors = [
   { label: '1st Floor', dots: [false, false, true, false, false, false] },
 ]
 
-// Hero gallery — cycle through real room images
+// Hero gallery — cycle through real room images (webp = fast)
 const heroImages = [
-  '/images/room-1.png',
-  '/images/room-3.png',
-  '/images/room-5.png',
-  '/images/room-18.png',
-  '/images/room-21.png',
+  '/images/room-1.webp',
+  '/images/room-3.webp',
+  '/images/room-5.webp',
+  '/images/room-18.webp',
+  '/images/room-21.webp',
 ]
 
 export default function Hero() {

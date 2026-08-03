@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from 'react'
+import LazyImage from './LazyImage'
 
 const scrollTo = (id) =>
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
@@ -10,7 +11,7 @@ const rooms = [
     desc: 'Elegant king-bed studio with modern furnishings, private bathroom, and city views. Perfect for solo travelers and couples.',
     features: ['King-size bed', 'Private bathroom', 'High-speed Wi-Fi', 'Smart TV'],
     featured: true,
-    images: ['/images/room-2.png', '/images/room-4.png', '/images/room-6.png'],
+    images: ['/images/room-2.webp', '/images/room-4.webp', '/images/room-6.webp'],
   },
   {
     icon: '🛏️',
@@ -18,7 +19,7 @@ const rooms = [
     desc: 'Spacious large studio with extra floor space — ideal for extended stays and business travelers.',
     features: ['Large double bed', 'Work desk', 'Mini kitchen', 'Air conditioning'],
     featured: false,
-    images: ['/images/room-7.png', '/images/room-8.png', '/images/room-9.png'],
+    images: ['/images/room-7.webp', '/images/room-8.webp', '/images/room-9.webp'],
   },
   {
     icon: '👥',
@@ -26,7 +27,7 @@ const rooms = [
     desc: 'Two comfortable single beds in a well-designed layout — great for friends or colleagues traveling together.',
     features: ['Two single beds', 'Shared vanity', 'Wardrobe storage', 'Blackout curtains'],
     featured: false,
-    images: ['/images/room-10.png', '/images/room-11.png', '/images/room-12.png'],
+    images: ['/images/room-10.webp', '/images/room-11.webp', '/images/room-12.webp'],
   },
   {
     icon: '✨',
@@ -34,7 +35,7 @@ const rooms = [
     desc: 'Premium suite experience with a separate living area, luxury bath, and panoramic views of Trivandrum.',
     features: ['Separate living area', 'Premium bath', 'City view', 'Premium amenities'],
     featured: false,
-    images: ['/images/room-16.png', '/images/room-17.png', '/images/room-18.png'],
+    images: ['/images/room-16.webp', '/images/room-17.webp', '/images/room-18.webp'],
   },
   {
     icon: '🏡',
@@ -42,7 +43,7 @@ const rooms = [
     desc: 'Generous family room with multiple beds and ample space for families to relax and unwind comfortably.',
     features: ['Multiple beds', 'Extra space', 'Family amenities', 'Child-friendly'],
     featured: false,
-    images: ['/images/room-22.png', '/images/room-23.png', '/images/room-24.png'],
+    images: ['/images/room-22.webp', '/images/room-23.webp', '/images/room-24.webp'],
   },
   {
     icon: '👑',
@@ -50,7 +51,7 @@ const rooms = [
     desc: 'Our finest offering — the VIP room on the top floor with exclusive access, premium décor, and concierge service.',
     features: ['Top floor location', 'Exclusive access', 'Concierge service', 'Premium décor'],
     featured: true,
-    images: ['/images/room-27.png', '/images/room-28.png', '/images/room-29.png'],
+    images: ['/images/room-27.webp', '/images/room-28.webp', '/images/room-29.webp'],
   },
 ]
 
@@ -102,15 +103,13 @@ function RoomCard({ room, index }) {
       }}
     >
       {/* Room image */}
-      <div style={{ position: 'relative', height: 200, overflow: 'hidden' }}>
-        <img
+      <div style={{ position: 'relative', height: 200 }}>
+        <LazyImage
           src={room.images[0]}
           alt={room.name}
-          style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.4s ease' }}
-          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
-          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
+          style={{ height: 200 }}
+          imgStyle={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
-        {/* Image count badge */}
         <div style={{
           position: 'absolute', bottom: 10, right: 10,
           background: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(8px)',

@@ -1,7 +1,8 @@
 import { useState } from 'react'
+import LazyImage from './LazyImage'
 
-// All 31 images distributed across gallery
-const allImages = Array.from({ length: 31 }, (_, i) => `/images/room-${i + 1}.png`)
+// All 31 webp images — fast loading
+const allImages = Array.from({ length: 31 }, (_, i) => `/images/room-${i + 1}.webp`)
 
 export default function Gallery() {
   const [selected, setSelected] = useState(null)
@@ -53,11 +54,11 @@ export default function Gallery() {
                 e.currentTarget.style.boxShadow = 'none'
               }}
             >
-              <img
+              <LazyImage
                 src={src}
                 alt={`BnB Homes room ${i + 1}`}
-                loading="lazy"
-                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                style={{ width: '100%', height: '100%' }}
+                imgStyle={{ width: '100%', height: '100%', objectFit: 'cover' }}
               />
             </div>
           ))}

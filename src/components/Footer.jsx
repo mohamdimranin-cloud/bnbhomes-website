@@ -50,15 +50,12 @@ export default function Footer() {
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: 10,
-                fontFamily: '"Space Grotesk", sans-serif',
-                fontWeight: 700,
-                fontSize: '1.4rem',
                 textDecoration: 'none',
                 marginBottom: 16,
               }}
             >
-              <span style={{ fontSize: '1.6rem', color: '#00e5ff' }}>⬡</span>
-              <span style={{ color: '#ffffff' }}>
+              <img src="/logo.png" alt="BnB Homes" style={{ height: 36, width: 'auto' }} />
+              <span style={{ fontFamily: '"Space Grotesk", sans-serif', fontWeight: 700, fontSize: '1.3rem', color: '#ffffff' }}>
                 BnB <span style={{ color: '#00e5ff' }}>Homes</span>
               </span>
             </a>
