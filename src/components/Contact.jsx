@@ -346,16 +346,22 @@ export default function Contact() {
                           alignItems: 'center',
                           padding: '9px 0',
                           borderBottom: '1px solid rgba(17,104,133,0.15)',
-                          gap: 8,
-                          flexWrap: isMobile ? 'wrap' : 'nowrap',
+                          gap: 12,
+                          minWidth: 0,
                         }}>
-                          <span style={{ fontSize: '0.82rem', color: '#7ba3b8', flexShrink: 0 }}>{label}</span>
+                          <span style={{
+                            fontSize: '0.82rem', color: '#7ba3b8',
+                            flexShrink: 0, whiteSpace: 'nowrap',
+                          }}>{label}</span>
                           <span style={{
                             fontSize: '0.88rem', fontWeight: 600,
                             fontFamily: label.includes('ID') ? '"Space Grotesk", sans-serif' : 'inherit',
                             color: label.includes('ID') ? '#00e5ff' : '#ffffff',
-                            wordBreak: 'break-all',
                             textAlign: 'right',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap',
+                            minWidth: 0,
                           }}>{value}</span>
                         </div>
                       ))}
@@ -371,7 +377,7 @@ export default function Contact() {
                   {step > 0 && (
                     <button type="button" onClick={() => setStep(s => s - 1)}
                       className="btn-ghost"
-                      style={{ flex: 1, justifyContent: 'center', padding: '14px' }}
+                      style={{ flex: 1, justifyContent: 'center', padding: '14px', borderRadius: 12, whiteSpace: 'nowrap' }}
                     >
                       ← Back
                     </button>
@@ -383,6 +389,7 @@ export default function Contact() {
                       style={{
                         flex: 1, justifyContent: 'center', padding: '14px', border: 'none',
                         opacity: canNext() ? 1 : 0.5, cursor: canNext() ? 'pointer' : 'not-allowed',
+                        borderRadius: 12, whiteSpace: 'nowrap',
                       }}
                     >
                       Next →
@@ -390,7 +397,11 @@ export default function Contact() {
                   ) : (
                     <button type="button" onClick={handleSubmit}
                       className="btn-primary"
-                      style={{ flex: 1, justifyContent: 'center', padding: '14px', border: 'none', fontSize: '1rem' }}
+                      style={{
+                        flex: 1, justifyContent: 'center', padding: '14px', border: 'none',
+                        fontSize: isMobile ? '0.9rem' : '1rem',
+                        borderRadius: 12, whiteSpace: 'nowrap',
+                      }}
                     >
                       📲 Confirm on WhatsApp
                     </button>
