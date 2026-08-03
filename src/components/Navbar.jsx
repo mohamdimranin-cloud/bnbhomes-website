@@ -15,6 +15,7 @@ export default function Navbar() {
 
   const navLinks = [
     { label: 'Rooms', id: 'rooms' },
+    { label: 'Gallery', id: 'gallery' },
     { label: 'Amenities', id: 'amenities' },
     { label: 'Location', id: 'location' },
     { label: 'Contact', id: 'contact' },

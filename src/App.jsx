@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import Rooms from './components/Rooms'
+import Gallery from './components/Gallery'
 import Amenities from './components/Amenities'
 import Location from './components/Location'
 import Contact from './components/Contact'
@@ -20,13 +21,11 @@ export default function App() {
       },
       { threshold: 0.1, rootMargin: '0px 0px -60px 0px' }
     )
-
     const cards = document.querySelectorAll('.animate-card')
     cards.forEach((el, i) => {
       el.style.transitionDelay = `${i * 0.07}s`
       observer.observe(el)
     })
-
     return () => observer.disconnect()
   }, [])
 
@@ -35,6 +34,7 @@ export default function App() {
       <Navbar />
       <Hero />
       <Rooms />
+      <Gallery />
       <Amenities />
       <Location />
       <Contact />

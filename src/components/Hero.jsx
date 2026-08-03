@@ -4,36 +4,30 @@ const scrollTo = (id) =>
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 
 const initialFloors = [
-  {
-    label: '5th Floor',
-    dots: [false, false, false, false, false],
-  },
-  {
-    label: '4th Floor',
-    dots: [true, false, false, true, false, false],
-  },
-  {
-    label: '3rd Floor',
-    dots: [false, true, false, false, false, true],
-  },
-  {
-    label: '2nd Floor',
-    dots: [true, true, false, false, true, false],
-  },
-  {
-    label: '1st Floor',
-    dots: [false, false, true, false, false, false],
-  },
+  { label: '5th Floor', dots: [false, false, false, false, false] },
+  { label: '4th Floor', dots: [true, false, false, true, false, false] },
+  { label: '3rd Floor', dots: [false, true, false, false, false, true] },
+  { label: '2nd Floor', dots: [true, true, false, false, true, false] },
+  { label: '1st Floor', dots: [false, false, true, false, false, false] },
+]
+
+// Hero gallery — cycle through real room images
+const heroImages = [
+  '/images/room-1.png',
+  '/images/room-3.png',
+  '/images/room-5.png',
+  '/images/room-18.png',
+  '/images/room-21.png',
 ]
 
 export default function Hero() {
   const [floors, setFloors] = useState(initialFloors)
+  const [imgIdx, setImgIdx] = useState(0)
 
   useEffect(() => {
     const interval = setInterval(() => {
       setFloors((prev) => {
         const next = prev.map((floor) => ({ ...floor, dots: [...floor.dots] }))
-        // pick a random floor and random dot to toggle
         const fi = Math.floor(Math.random() * next.length)
         const di = Math.floor(Math.random() * next[fi].dots.length)
         next[fi].dots[di] = !next[fi].dots[di]
@@ -41,6 +35,12 @@ export default function Hero() {
       })
     }, 2500)
     return () => clearInterval(interval)
+  }, [])
+
+  // Cycle hero images every 4s
+  useEffect(() => {
+    const t = setInterval(() => setImgIdx((i) => (i + 1) % heroImages.length), 4000)
+    return () => clearInterval(t)
   }, [])
 
   return (
@@ -55,6 +55,15 @@ export default function Hero() {
         padding: '100px 24px 60px',
       }}
     >
+      {/* Background room image */}
+      <div style={{
+        position: 'absolute', inset: 0, zIndex: 0,
+        backgroundImage: `url(${heroImages[imgIdx]})`,
+        backgroundSize: 'cover', backgroundPosition: 'center',
+        transition: 'background-image 1s ease',
+        filter: 'brightness(0.18) saturate(0.6)',
+      }} />
+
       {/* Grid overlay */}
       <div className="hero-grid" />
       {/* Orbs */}
