@@ -46,7 +46,9 @@ export default function Contact() {
   const handleSubmit = async () => {
     const { name, phone, email, checkin, checkout, guests } = form
 
-    // 1. Save to Neon DB via the Render API
+    setSubmitted(true) // Show thank you immediately
+
+    // Save to Neon DB via the Render API
     try {
       await fetch('https://bnbhomes-api.onrender.com/advanceBooking', {
         method: 'POST',
@@ -68,7 +70,7 @@ export default function Contact() {
           discountAmt: 0,
           finalAmount: 0,
           advanceAmount: 0,
-          paidVia: 'WhatsApp',
+          paidVia: 'Website',
           paidReference: null,
           balanceAmount: 0,
           remarks: `Guests: ${guests} | Website booking`,
@@ -77,26 +79,8 @@ export default function Contact() {
         }),
       })
     } catch (_) {
-      // Silent — WhatsApp fallback always works
+      // Silent fail — booking ID is already shown to user
     }
-
-    // 2. Open WhatsApp with pre-filled message
-    const waText = encodeURIComponent(
-      `🏨 *BnB Homes — Advance Booking Request*\n\n` +
-      `📋 Booking ID: *${bookingId}*\n` +
-      `👤 Name: ${name}\n` +
-      `📱 Phone: ${phone}\n` +
-      `✉️ Email: ${email || 'N/A'}\n` +
-      `📅 Check-in: ${checkin}\n` +
-      `📅 Check-out: ${checkout}\n` +
-      `🌙 Nights: ${nights}\n` +
-      `👥 Guests: ${guests}\n\n` +
-      `Please confirm availability. Thank you!`
-    )
-    setSubmitted(true)
-    setTimeout(() => {
-      window.open(`https://wa.me/917540000750?text=${waText}`, '_blank')
-    }, 800)
   }
 
   const canNext = () => {
@@ -441,11 +425,11 @@ export default function Contact() {
                         flex: 1, justifyContent: 'center',
                         padding: '13px 8px', border: 'none',
                         borderRadius: 12, whiteSpace: 'nowrap',
-                        fontSize: isMobile ? '0.82rem' : '0.95rem',
-                        minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis',
+                        fontSize: '0.95rem',
+                        minWidth: 0,
                       }}
                     >
-                      📲 Confirm on WhatsApp
+                      ✓ Confirm Booking
                     </button>
                   )}
                 </div>
@@ -453,32 +437,39 @@ export default function Contact() {
               </div>
             </div>
           ) : (
-            /* ── Success card ── */
+            /* ── Thank You card ── */
             <div style={{
               background: 'linear-gradient(145deg, #0f1e2d, #0a1520)',
               border: '1px solid rgba(0,229,255,0.3)',
               borderRadius: 24, padding: isMobile ? 28 : 48, textAlign: 'center',
               boxShadow: '0 20px 60px rgba(0,0,0,0.5), 0 0 60px rgba(0,229,255,0.1)',
             }}>
-              <div style={{ fontSize: '3.5rem', marginBottom: 20 }}>🎉</div>
-              <h3 style={{ fontFamily: '"Space Grotesk", sans-serif', fontSize: '1.5rem', fontWeight: 700, color: '#ffffff', marginBottom: 12 }}>
-                Booking Request Sent!
-              </h3>
-              <div style={{
-                display: 'inline-block',
-                fontFamily: '"Space Grotesk", sans-serif', fontSize: '1rem', fontWeight: 700,
-                color: '#00e5ff', background: 'rgba(0,229,255,0.1)',
-                border: '1px solid rgba(0,229,255,0.3)',
-                padding: '8px 20px', borderRadius: 10, marginBottom: 20, letterSpacing: '1px',
-                wordBreak: 'break-all',
+              <div style={{ fontSize: '4rem', marginBottom: 16 }}>🙏</div>
+              <h3 style={{
+                fontFamily: '"Space Grotesk", sans-serif',
+                fontSize: '1.6rem', fontWeight: 800, color: '#ffffff', marginBottom: 12,
               }}>
-                {bookingId}
+                Thank You!
+              </h3>
+              <p style={{ color: '#7ba3b8', fontSize: '1rem', lineHeight: 1.7, marginBottom: 24 }}>
+                Your booking has been received.<br />
+                Our team will contact you shortly to confirm availability.
+              </p>
+              <div style={{
+                display: 'inline-flex', alignItems: 'center', gap: 10,
+                fontFamily: '"Space Grotesk", sans-serif', fontSize: '0.9rem', fontWeight: 700,
+                color: '#00e5ff', background: 'rgba(0,229,255,0.08)',
+                border: '1px solid rgba(0,229,255,0.25)',
+                padding: '10px 20px', borderRadius: 10, marginBottom: 28,
+              }}>
+                <span>📋</span>
+                <span>{bookingId}</span>
               </div>
-              <p style={{ color: '#7ba3b8', lineHeight: 1.7, marginBottom: 28 }}>
-                Opening WhatsApp to confirm your reservation with our team. We'll get back to you shortly!
+              <p style={{ fontSize: '0.78rem', color: '#7ba3b8', marginBottom: 28 }}>
+                Save your Booking ID for reference
               </p>
               <button onClick={() => { setSubmitted(false); setStep(0) }}
-                className="btn-ghost" style={{ justifyContent: 'center' }}>
+                className="btn-ghost" style={{ justifyContent: 'center', borderRadius: 12 }}>
                 Make Another Booking
               </button>
             </div>
