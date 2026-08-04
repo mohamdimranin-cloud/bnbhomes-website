@@ -50,9 +50,11 @@ export default function Contact() {
 
     // Save to Neon DB via the Render API
     try {
-      await fetch('https://bnbhomes-api.onrender.com/advanceBooking', {
+      const res = await fetch('https://bnbhomes-api.onrender.com/public/advanceBooking', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        mode: 'cors',
+        credentials: 'omit',
         body: JSON.stringify({
           guestName: name,
           guestMobile: phone,
