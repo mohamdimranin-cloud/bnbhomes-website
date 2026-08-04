@@ -43,8 +43,44 @@ export default function Contact() {
     ? Math.max(0, Math.round((new Date(form.checkout) - new Date(form.checkin)) / 86400000))
     : 0
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const { name, phone, email, checkin, checkout, guests } = form
+
+    // 1. Save to Neon DB via the Render API
+    try {
+      await fetch('https://bnbhomes-api.onrender.com/advanceBooking', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          guestName: name,
+          guestMobile: phone,
+          guestWhatsapp: phone,
+          guestEmail: email || null,
+          guestType: 'Direct',
+          corporateName: null,
+          checkInDate: checkin,
+          checkOutDate: checkout,
+          numberOfNights: nights,
+          roomType: '',
+          numberOfRooms: 1,
+          ratePerRoom: 0,
+          totalAmount: 0,
+          discountAmt: 0,
+          finalAmount: 0,
+          advanceAmount: 0,
+          paidVia: 'WhatsApp',
+          paidReference: null,
+          balanceAmount: 0,
+          remarks: `Guests: ${guests} | Website booking`,
+          bookingRef: bookingId,
+          previousRef: null,
+        }),
+      })
+    } catch (_) {
+      // Silent — WhatsApp fallback always works
+    }
+
+    // 2. Open WhatsApp with pre-filled message
     const waText = encodeURIComponent(
       `🏨 *BnB Homes — Advance Booking Request*\n\n` +
       `📋 Booking ID: *${bookingId}*\n` +
@@ -373,11 +409,15 @@ export default function Contact() {
                 )}
 
                 {/* Navigation buttons */}
-                <div style={{ display: 'flex', gap: 12, marginTop: 24 }}>
+                <div style={{ display: 'flex', gap: 10, marginTop: 24 }}>
                   {step > 0 && (
                     <button type="button" onClick={() => setStep(s => s - 1)}
                       className="btn-ghost"
-                      style={{ flex: 1, justifyContent: 'center', padding: '14px', borderRadius: 12, whiteSpace: 'nowrap' }}
+                      style={{
+                        flex: '0 0 auto', width: 100,
+                        justifyContent: 'center', padding: '13px 12px',
+                        borderRadius: 12, whiteSpace: 'nowrap', fontSize: '0.9rem',
+                      }}
                     >
                       ← Back
                     </button>
@@ -387,9 +427,9 @@ export default function Contact() {
                       onClick={() => { if (canNext()) setStep(s => s + 1) }}
                       className="btn-primary"
                       style={{
-                        flex: 1, justifyContent: 'center', padding: '14px', border: 'none',
+                        flex: 1, justifyContent: 'center', padding: '13px 12px', border: 'none',
                         opacity: canNext() ? 1 : 0.5, cursor: canNext() ? 'pointer' : 'not-allowed',
-                        borderRadius: 12, whiteSpace: 'nowrap',
+                        borderRadius: 12, whiteSpace: 'nowrap', fontSize: '0.9rem',
                       }}
                     >
                       Next →
@@ -398,9 +438,11 @@ export default function Contact() {
                     <button type="button" onClick={handleSubmit}
                       className="btn-primary"
                       style={{
-                        flex: 1, justifyContent: 'center', padding: '14px', border: 'none',
-                        fontSize: isMobile ? '0.9rem' : '1rem',
+                        flex: 1, justifyContent: 'center',
+                        padding: '13px 8px', border: 'none',
                         borderRadius: 12, whiteSpace: 'nowrap',
+                        fontSize: isMobile ? '0.82rem' : '0.95rem',
+                        minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis',
                       }}
                     >
                       📲 Confirm on WhatsApp
