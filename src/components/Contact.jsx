@@ -52,7 +52,7 @@ export default function Contact() {
     try {
       const res = await fetch('https://bnbhomes-api.onrender.com/public/advanceBooking', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'text/plain' },
         mode: 'cors',
         credentials: 'omit',
         body: JSON.stringify({
